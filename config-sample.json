@@ -1,0 +1,27 @@
+{
+  "server": {
+    "url": "example.com",
+    "username": "root",
+    "rootDirectory": "~/www",
+    "excludePattern": "wp-content/xcloner-backups/"
+  },
+  "mirrorDirectory": "mirror",
+  "requiredFileRegex": "^www/wp/wordpress/wp-content/backupwordpress-backups/database-\\d{4}-\\d\\d-\\d\\d-\\d\\d-\\d\\d-\\d\\d.zip$",
+  "archive": {
+    "directory": "archive",
+    "keepPassed": 10,
+    "keepFailed": 5
+  },
+  "email": {
+    "mailer": {
+      "host": "smtp.example.com",
+      "port": 465,
+      "secure": true,
+      "username": "root@example.com",
+      "password": "secret"
+    },
+    "recipients": [
+      "Felix Edelmann <felix@vaterstetten-in-zahlen.de>"
+    ]
+  }
+}

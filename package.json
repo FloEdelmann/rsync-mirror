@@ -1,0 +1,11 @@
+{
+  "name": "rsync-mirror",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "Felix Edelmann",
+  "license": "MIT",
+  "dependencies": {
+    "nodemailer": "^6.4.2"
+  }
+}
