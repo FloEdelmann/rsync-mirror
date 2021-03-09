@@ -93,19 +93,19 @@ console.log();
 
     const passed = requiredFiles.length > 0;
     if (passed) {
-      mailBodyLines.unshift(...[
+      mailBodyLines.unshift(
         `Mirroring the ${config.server.url} server data was successful.`,
         `These are the required files that were downloaded today:`,
         ...requiredFiles.map(file => `- ${file}`),
         ``
-      ]);
+      );
     }
     else {
-      mailBodyLines.unshift(...[
+      mailBodyLines.unshift(
         `Mirroring the ${config.server.url} server data has failed, as there was no file added that matches the following regex:`,
         requiredFileRegex,
         ``
-      ]);
+      );
     }
 
     const archiveDirectory = path.join(__dirname, config.archive.directory);
