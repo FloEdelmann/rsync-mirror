@@ -5,10 +5,10 @@
     "rootDirectory": "~/www",
     "excludePattern": "wp-content/xcloner-backups/"
   },
-  "mirrorDirectory": "mirror",
+  "mirrorDirectory": "mirrored/example/mirror",
   "requiredFileRegex": "^www/wp/wordpress/wp-content/backupwordpress-backups/database-\\d{4}-\\d\\d-\\d\\d-\\d\\d-\\d\\d-\\d\\d.zip$",
   "archive": {
-    "directory": "archive",
+    "directory": "mirrored/example/archive",
     "keepPassed": 10,
     "keepFailed": 5
   },
