@@ -45,6 +45,7 @@ console.log();
     const mirrorDirectory = path.join(configDirectory, config.mirrorDirectory);
     const rsyncCommand = `rsync --recursive --exclude="${config.server.excludePattern}" --times --itemize-changes --delete ${config.server.username}@${config.server.url}:${config.server.rootDirectory} ${mirrorDirectory}`;
     console.log(`Executing rsync with command: ${rsyncCommand}\n`);
+    fs.mkdirSync(mirrorDirectory, { recursive: true });
 
     // throws if the rsync command fails,
     // i.e. if it times out (default timeout: undefined) or has a non-zero exitcode
