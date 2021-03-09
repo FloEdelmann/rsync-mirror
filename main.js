@@ -4,7 +4,22 @@ const fs = require(`fs`);
 const nodemailer = require(`nodemailer`);
 const path = require(`path`);
 
-const config = require(`./config.json`);
+if (process.argv.length !== 3) {
+  console.error(`Usage: ${__filename} <config filename>`)
+  process.exit(1);
+}
+
+const configPath = path.resolve(process.argv[2]);
+let config;
+
+try {
+  console.log(`Using config file:`, configPath);
+  config = require(configPath);
+}
+catch (error) {
+  console.error(`Could not read config file:`, error.message);
+  process.exit(1);
+}
 
 const DEBUG_MOCK_RSYNC = false;
 const DEBUG_RSYNC_OUTPUT = `*deleting   www/wp/wordpress/test/e
