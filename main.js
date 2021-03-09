@@ -10,6 +10,7 @@ if (process.argv.length !== 3) {
 }
 
 const configPath = path.resolve(process.argv[2]);
+const configDirectory = path.dirname(configPath);
 let config;
 
 try {
@@ -41,8 +42,8 @@ console.log();
 
 (async () => {
   try {
-    const mirrorDirectory = path.join(__dirname, config.mirrorDirectory);
-    const rsyncCommand = `rsync --recursive --exclude=${config.server.excludePattern} --times --itemize-changes --delete ${config.server.username}@${config.server.url}:${config.server.rootDirectory} ${mirrorDirectory}`;
+    const mirrorDirectory = path.join(configDirectory, config.mirrorDirectory);
+    const rsyncCommand = `rsync --recursive --exclude="${config.server.excludePattern}" --times --itemize-changes --delete ${config.server.username}@${config.server.url}:${config.server.rootDirectory} ${mirrorDirectory}`;
     console.log(`Executing rsync with command: ${rsyncCommand}\n`);
 
     // throws if the rsync command fails,
@@ -123,7 +124,7 @@ console.log();
       );
     }
 
-    const archiveDirectory = path.join(__dirname, config.archive.directory);
+    const archiveDirectory = path.join(configDirectory, config.archive.directory);
 
     const sanitizedDate = (new Date()).toISOString() // e.g. 2019-12-27T22:58:02.786Z
       .replace(/\.\d\d\dZ$/, ``) // => 2019-12-27T22:58:02
@@ -133,6 +134,7 @@ console.log();
     const zipCommand = `zip --quiet -r ${newArchiveFile} ${DEBUG_MOCK_ZIP ? `./www/wp/wordpress/wp-admin/` : `.`}`;
 
     console.log(`Archiving current mirror directory (cwd: mirror directory): ${zipCommand} ...`);
+    fs.mkdirSync(archiveDirectory, { recursive: true });
     const zipOutput = child_process.execSync(zipCommand, { cwd: mirrorDirectory, encoding: `utf8` });
     if (zipOutput !== ``) {
       throw new Error(`Unexpected stdout from zip command:\n${zipOutput}`);
