@@ -94,7 +94,7 @@ console.log();
     const passed = requiredFiles.length > 0;
     if (passed) {
       mailBodyLines.unshift(...[
-        `Mirroring the susanne-edelmann.de server data was successful.`,
+        `Mirroring the ${config.server.url} server data was successful.`,
         `These are the required files that were downloaded today:`,
         ...requiredFiles.map(file => `- ${file}`),
         ``
@@ -102,7 +102,7 @@ console.log();
     }
     else {
       mailBodyLines.unshift(...[
-        `Mirroring the susanne-edelmann.de server data has failed, as there was no file added that matches the following regex:`,
+        `Mirroring the ${config.server.url} server data has failed, as there was no file added that matches the following regex:`,
         requiredFileRegex,
         ``
       ]);
@@ -114,7 +114,7 @@ console.log();
       .replace(/\.\d\d\dZ$/, ``) // => 2019-12-27T22:58:02
       .replace(/T/, `_`) // => 2019-12-27_22:58:02
       .replace(/:/g, `-`); // => 2019-12-27_22-58-02
-    const newArchiveFile = path.join(archiveDirectory, `backup_susanne-edelmann_${sanitizedDate}_${passed ? `passed` : `failed`}.zip`);
+    const newArchiveFile = path.join(archiveDirectory, `backup_${config.server.url}_${sanitizedDate}_${passed ? `passed` : `failed`}.zip`);
     const zipCommand = `zip --quiet -r ${newArchiveFile} ${DEBUG_MOCK_ZIP ? `./www/wp/wordpress/wp-admin/` : `.`}`;
 
     console.log(`Archiving current mirror directory (cwd: mirror directory): ${zipCommand} ...`);
@@ -178,7 +178,7 @@ console.log();
  * @param {string} textContent The mail's body.
  */
 async function sendMail(failOrPass = null, textContent = null) {
-  const subject = `[${failOrPass}] susanne-edelmann.de mirror`;
+  const subject = `[${failOrPass}] ${config.server.url} mirror`;
 
   if (!failOrPass || !textContent) {
     throw new Error(`failOrPass and textContent must not be empty. ${JSON.stringify({failOrPass, textContent})}`);
@@ -205,7 +205,7 @@ async function sendMail(failOrPass = null, textContent = null) {
   });
 
   const info = await transporter.sendMail({
-    from: `"susanne-edelmann.de mirror" <${config.email.mailer.username}>`,
+    from: `"${config.server.url} mirror" <${config.email.mailer.username}>`,
     to: config.email.recipients.join(`, `),
     subject: subject,
     text: textContent,
