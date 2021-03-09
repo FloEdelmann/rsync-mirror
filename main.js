@@ -155,17 +155,22 @@ console.log();
     mailBodyLines.push(`This email was sent by ${__filename}`);
 
     await sendMail(passed ? `PASS` : `FAIL`, mailBodyLines.join(`\n`));
+
+    console.log(`Done at ${(new Date()).toISOString()}.`);
   }
   catch (error) {
-    await sendMail(`FAIL`, `Script ${__filename} failed with following error:\n${error.stack}`);
+    try {
+      await sendMail(`FAIL`, `Script ${__filename} failed with following error:\n${error.stack}`);
+    }
+    catch (sendMailError) {
+      console.error(`Error executing script:`);
+      console.error(error);
+    }
+    finally {
+      process.exit(1);
+    }
   }
-})().catch(error => {
-  console.error(`Error executing script:`);
-  console.error(error);
-  process.exit(1);
-}).then(() => {
-  console.log(`Done at ${(new Date()).toISOString()}.`);
-})
+})();
 
 /**
  * Sends a status email with sender and recipient defined in configuration.
