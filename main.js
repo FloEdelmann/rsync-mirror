@@ -74,26 +74,30 @@ console.log();
     ];
     console.log(mailBodyLines.join(`\n`));
 
-    const requiredFileRegex = new RegExp(config.requiredFileRegex);
-    const requiredFiles = addedFiles.filter(
-      file => requiredFileRegex.exec(file) !== null
-    );
+    let passed = true;
 
-    const passed = requiredFiles.length > 0;
-    if (passed) {
-      mailBodyLines.unshift(
-        `Mirroring the ${config.server.url} server data was successful.`,
-        `These are the required files that were downloaded today:`,
-        ...requiredFiles.map(file => `- ${file}`),
-        ``
+    if (config.requiredFileRegex) {
+      const requiredFileRegex = new RegExp(config.requiredFileRegex);
+      const requiredFiles = addedFiles.filter(
+        file => requiredFileRegex.exec(file) !== null
       );
-    }
-    else {
-      mailBodyLines.unshift(
-        `Mirroring the ${config.server.url} server data has failed, as there was no file added that matches the following regex:`,
-        requiredFileRegex,
-        ``
-      );
+
+      passed = requiredFiles.length > 0;
+      if (passed) {
+        mailBodyLines.unshift(
+          `Mirroring the ${config.server.url} server data was successful.`,
+          `These are the required files that were downloaded today:`,
+          ...requiredFiles.map(file => `- ${file}`),
+          ``
+        );
+      }
+      else {
+        mailBodyLines.unshift(
+          `Mirroring the ${config.server.url} server data has failed, as there was no file added that matches the following regex:`,
+          requiredFileRegex,
+          ``
+        );
+      }
     }
 
     const archiveDirectory = path.join(configDirectory, config.archive.directory);
