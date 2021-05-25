@@ -57,38 +57,8 @@ console.log();
     console.log(rsyncOutput);
     console.log(`--------\n`);
 
-    const deletedFiles = [];
-    const addedFiles = [];
-    const modifiedFiles = [];
-
-    // see https://linux.die.net/man/1/rsync to understand the output
-    const deletedRegex = /^\*deleting   (?<file>.*)$/; // see --delete option
-    const itemizedRegex = /^(?<updateType>[>c.])(?<fileType>[fd])(?<attributes>[+.cstTpoguax]{9}) (?<file>.*)$/; // see --itemize-changes option
-
     console.log(`Parsing rsync output...`)
-    const outputLines = rsyncOutput.split(`\n`).slice(0, -1);
-    for (const line of outputLines) {
-      const deletedRegexResult = deletedRegex.exec(line);
-      const itemizedRegexResult = itemizedRegex.exec(line);
-
-      if (deletedRegexResult !== null) {
-        deletedFiles.push(deletedRegexResult.groups.file);
-      }
-      else if (itemizedRegexResult != null) {
-        // only handle downloaded files
-        if (itemizedRegexResult.groups.updateType === `>` && itemizedRegexResult.groups.fileType === `f`) {
-          if (itemizedRegexResult.groups.attributes === `+++++++++`) {
-            addedFiles.push(itemizedRegexResult.groups.file);
-          }
-          else {
-            modifiedFiles.push(itemizedRegexResult.groups.file);
-          }
-        }
-      }
-      else {
-        throw new Error(`Unable to handle rsync output:\n${line}`);
-      }
-    }
+    const { deletedFiles, addedFiles, modifiedFiles } = parseRsyncOutput(rsyncOutput)
     console.log(`Done.\n`);
 
     const mailBodyLines = [
@@ -232,4 +202,45 @@ async function sendMail(failOrPass = null, textContent = null) {
   });
 
   console.log(`Message sent:`, info);
+}
+
+/**
+ * Read names of deleted, added or modified files from rsync output.
+ * @param {string} rsyncOutput The stdout from rsync.
+ * @returns {object} An object with deletedFiles, addedFiles and modifiedFiles as properties, holding an array of file names eachs.
+ */
+function parseRsyncOutput(rsyncOutput) {
+  const deletedFiles = [];
+  const addedFiles = [];
+  const modifiedFiles = [];
+
+  // see https://linux.die.net/man/1/rsync to understand the output
+  const deletedRegex = /^\*deleting   (?<file>.*)$/; // see --delete option
+  const itemizedRegex = /^(?<updateType>[>c.])(?<fileType>[fd])(?<attributes>[+.cstTpoguax]{9}) (?<file>.*)$/; // see --itemize-changes option
+
+  const outputLines = rsyncOutput.split(`\n`).slice(0, -1);
+  for (const line of outputLines) {
+    const deletedRegexResult = deletedRegex.exec(line);
+    const itemizedRegexResult = itemizedRegex.exec(line);
+
+    if (deletedRegexResult !== null) {
+      deletedFiles.push(deletedRegexResult.groups.file);
+    }
+    else if (itemizedRegexResult != null) {
+      // only handle downloaded files
+      if (itemizedRegexResult.groups.updateType === `>` && itemizedRegexResult.groups.fileType === `f`) {
+        if (itemizedRegexResult.groups.attributes === `+++++++++`) {
+          addedFiles.push(itemizedRegexResult.groups.file);
+        }
+        else {
+          modifiedFiles.push(itemizedRegexResult.groups.file);
+        }
+      }
+    }
+    else {
+      throw new Error(`Unable to handle rsync output:\n${line}`);
+    }
+  }
+
+  return { deletedFiles, addedFiles, modifiedFiles };
 }
